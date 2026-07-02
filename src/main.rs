@@ -31,7 +31,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     is_setup_done()?; //TODO
 
     match args.command {
-        Some(Commands::Setup) => run_setup(),
+        Some(Commands::Setup) => run_setup()?,
         None => print_about(),
     }
     Ok(())
