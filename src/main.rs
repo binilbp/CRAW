@@ -1,5 +1,5 @@
 use clap::{Parser, Subcommand};
-use craw::{is_setup_done, run_setup};
+use craw::run_setup;
 use std::error::Error;
 
 #[derive(Parser)]
@@ -28,10 +28,10 @@ enum Commands {
 
 fn main() -> Result<(), Box<dyn Error>> {
     let args = Args::parse();
-    is_setup_done()?; //TODO
+    let mut cfg = confy::load("craw", "craw-config")?;
 
     match args.command {
-        Some(Commands::Setup) => run_setup()?,
+        Some(Commands::Setup) => run_setup(&mut cfg)?,
         None => print_about(),
     }
     Ok(())
