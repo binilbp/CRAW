@@ -1,5 +1,5 @@
 use clap::{Parser, Subcommand};
-use craw::{config::Config, prompt_model, run_setup};
+use craw::{config::Config, prompt_agent, run_setup};
 use std::error::Error;
 
 #[derive(Parser, Debug)]
@@ -31,8 +31,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let args = Args::parse();
     let mut cfg: Config = confy::load("craw", "craw-config")?;
 
-    println!("{:?}", &args);
-    println!("{:?}", &cfg);
+    // println!("{:?}", &args);
+    // println!("{:?}", &cfg);
 
     if let Some(sub_command) = args.command {
         match sub_command {
@@ -51,7 +51,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     if cfg.api_service.is_none() {
         print_about();
     } else {
-        run_app(&args, &cfg)?;
+        run_app(&args, &cfg).await?;
     }
     Ok(())
 }
@@ -59,28 +59,30 @@ async fn main() -> Result<(), Box<dyn Error>> {
 //detailed custom about message when call CRAW without args
 fn print_about() {
     println!(
-        "\
-\n------
-CRAW 
-------
-\nYet another cli AI wrapper in RUST
+        r#"
+CRAW   Yet another Cli Rust AI Wrapper
 
 This tool was created with intention to learn RUST while trying to
 solve my annoyance of opening a browser or learning a new already
 available better tool to access LLM from a terminal.
 Use nerdfont for better experience !
-\n-> `craw setup` to get started
+
+-> `craw setup` to get started
+-> `craw "your prompt"` to prompt the llm
 -> `craw help` for more usage info
-\nFeel free to suggest changes or express your issues
-ps: the naming was hard, Cli Rust Ai Wrapper ;)
-"
+
+Feel free to suggest changes or express your issues
+
+ps: the naming took like 5 mins X)
+"#
     )
 }
 
-fn run_app(args: &Args, cfg: &Config) -> Result<(), Box<dyn Error>> {
+async fn run_app(args: &Args, cfg: &Config) -> Result<(), Box<dyn Error>> {
     if args.context.is_none() && args.prompt.is_some() {
         let prompt = args.prompt.as_ref().unwrap();
-        prompt_model(prompt, cfg);
+        let reply = prompt_agent(prompt, cfg).await?;
+        println!(": {reply}");
     } else {
         print_about();
     }

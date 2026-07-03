@@ -25,9 +25,16 @@ pub fn run_setup(cfg: &mut config::Config) -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-pub async fn prompt_model(prompt: &str, cfg: &Config) -> Result<String, Box<dyn Error>> {
-    let groq_client = groq::Client::new("YOUR_API_KEY")?;
-    let groq_agent = groq_client.agent("llama-3.3-70b-versatile").build();
+pub async fn prompt_agent(prompt: &str, _cfg: &Config) -> Result<String, Box<dyn Error>> {
+    //todo!! use service type from cfg
+    let api_key = keyring::get_key("groq_api_key")?;
+    let groq_client = groq::Client::new(api_key)?;
+    let groq_agent = groq_client
+        .agent("llama-3.3-70b-versatile")
+        .preamble("your name is `craw `. you are a text-based-llm accessible from user terminal")
+        .build();
+
     let response = groq_agent.prompt(prompt).await?;
+
     Ok(response)
 }
