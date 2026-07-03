@@ -8,4 +8,6 @@ description = "Cli Rust Ai Wrapper"
 clap = { version = "4.6.1", features = ["derive"] }
 confy = "2.0.0"
 keyring = "4.1.2"
+rig = "0.39.0"
 serde = { version = "1.0.228", features = ["derive"] }
+tokio = { version = "1.52.3", features = ["macros", "rt-multi-thread"] }
