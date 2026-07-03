@@ -1,38 +1,57 @@
 use clap::{Parser, Subcommand};
-use craw::run_setup;
+use craw::{config::Config, run_setup};
 use std::error::Error;
 
-#[derive(Parser)]
+#[derive(Parser, Debug)]
 #[command(version, about)]
 struct Args {
     #[command(subcommand)]
     command: Option<Commands>,
 
-    /// Pass content to LLM
-    content: Option<String>,
-
-    /// Pass custom prompt
-    #[arg(short, long)]
+    /// Pass your prompt
     prompt: Option<String>,
+
+    /// Pass context to LLM
+    context: Option<String>,
 
     /// Pass file to LLM
     #[arg(short, long)]
     file: Option<String>,
 }
 
-#[derive(Subcommand)]
+#[derive(Subcommand, Debug)]
 enum Commands {
     /// Start here. Setup CRAW
     Setup,
+    About,
 }
 
-fn main() -> Result<(), Box<dyn Error>> {
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn Error>> {
     let args = Args::parse();
-    let mut cfg = confy::load("craw", "craw-config")?;
+    let mut cfg: Config = confy::load("craw", "craw-config")?;
 
-    match args.command {
-        Some(Commands::Setup) => run_setup(&mut cfg)?,
-        None => print_about(),
+    // println!("{:?}", &args);
+    // println!("{:?}", &cfg);
+
+    if let Some(sub_command) = args.command {
+        match sub_command {
+            Commands::Setup => {
+                run_setup(&mut cfg)?;
+                return Ok(());
+            }
+            Commands::About => {
+                print_about();
+                return Ok(());
+            }
+        }
+    }
+
+    //first run or api setup not done
+    if cfg.api_service.is_none() {
+        print_about();
+    } else {
+        run_app()?;
     }
     Ok(())
 }
@@ -56,4 +75,9 @@ Use nerdfont for better experience !
 ps: the naming was hard, Cli Rust Ai Wrapper ;)
 "
     )
+}
+
+fn run_app() -> Result<(), Box<dyn Error>> {
+    println!("app running now");
+    Ok(())
 }
