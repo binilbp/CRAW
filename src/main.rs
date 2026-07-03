@@ -1,5 +1,5 @@
 use clap::{Parser, Subcommand};
-use craw::{config::Config, run_setup};
+use craw::{config::Config, prompt_model, run_setup};
 use std::error::Error;
 
 #[derive(Parser, Debug)]
@@ -31,8 +31,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let args = Args::parse();
     let mut cfg: Config = confy::load("craw", "craw-config")?;
 
-    // println!("{:?}", &args);
-    // println!("{:?}", &cfg);
+    println!("{:?}", &args);
+    println!("{:?}", &cfg);
 
     if let Some(sub_command) = args.command {
         match sub_command {
@@ -51,7 +51,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     if cfg.api_service.is_none() {
         print_about();
     } else {
-        run_app()?;
+        run_app(&args, &cfg)?;
     }
     Ok(())
 }
@@ -77,7 +77,12 @@ ps: the naming was hard, Cli Rust Ai Wrapper ;)
     )
 }
 
-fn run_app() -> Result<(), Box<dyn Error>> {
-    println!("app running now");
+fn run_app(args: &Args, cfg: &Config) -> Result<(), Box<dyn Error>> {
+    if args.context.is_none() && args.prompt.is_some() {
+        let prompt = args.prompt.as_ref().unwrap();
+        prompt_model(prompt, cfg);
+    } else {
+        print_about();
+    }
     Ok(())
 }
