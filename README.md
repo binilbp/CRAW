@@ -1,11 +1,10 @@
 # CRAW 
 
-**Yet another CLI AI wrapper in RUST**
+**Yet another CLI Rust AI Wrapper**
 
 This tool created with the intention to learn RUST while trying to solve the annoyance of opening a browser or learning a new, already available, better tool to access LLMs from a terminal.
-I have not yet implemented the API call, but it will be done soon!!
 
-btw the naming was hard ~Cli Rust Ai Wrapper :)
+btw the naming just took about 5 mins X)
 
 ---
 
@@ -13,7 +12,7 @@ btw the naming was hard ~Cli Rust Ai Wrapper :)
 
 *   **RUST** ofcourse !! visit https://rust-lang.org/tools/install/ if you dont have RUST installed already.
 *   **Nerd Font** in your terminal for a better visual experience (we got an icon in nerdfont)
-*   **GROQ API key** (will implement API call to groq service soon)
+*   **GROQ API key** currently only suppporting GROQ service(soon add more)
 
 ---
 
