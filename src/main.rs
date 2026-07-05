@@ -79,9 +79,8 @@ ps: the naming took like 5 mins X)
 }
 
 async fn run_app(args: &Args, cfg: &Config) -> Result<(), Box<dyn Error>> {
-    if args.context.is_none() && args.prompt.is_some() {
-        let prompt = args.prompt.as_ref().unwrap();
-        let reply = prompt_agent(prompt, cfg).await?;
+    if let Some(prompt) = &args.prompt {
+        let reply = prompt_agent(cfg, prompt, args.context.as_deref()).await?;
         println!(": {reply}");
     } else {
         print_about();
