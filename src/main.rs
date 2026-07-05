@@ -1,6 +1,6 @@
 use clap::{Parser, Subcommand};
 use craw::{config::Config, prompt_agent, run_setup};
-use std::error::Error;
+use std::{error::Error, path::PathBuf};
 
 #[derive(Parser, Debug)]
 #[command(version, about)]
@@ -8,21 +8,20 @@ struct Args {
     #[command(subcommand)]
     command: Option<Commands>,
 
-    /// Pass your prompt
+    /// Simple prompt and reply. Eg: craw -p "hello"
+    #[arg(short, long)]
     prompt: Option<String>,
-
-    /// Pass context to LLM
-    context: Option<String>,
 
     /// Pass file to LLM
     #[arg(short, long)]
-    file: Option<String>,
+    file: Option<PathBuf>,
 }
 
 #[derive(Subcommand, Debug)]
 enum Commands {
-    /// Start here. Setup CRAW
+    /// Setup craw, start here
     Setup,
+    /// Print info message
     About,
 }
 
@@ -30,7 +29,7 @@ enum Commands {
 async fn main() -> Result<(), Box<dyn Error>> {
     let args = Args::parse();
     let mut cfg: Config = confy::load("craw", "craw-config")?;
-
+    let context: Option<String> = None;
     // println!("{:?}", &args);
     // println!("{:?}", &cfg);
 
@@ -51,7 +50,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     if cfg.api_service.is_none() {
         print_about();
     } else {
-        run_app(&args, &cfg).await?;
+        run_app(&args, &cfg, context.as_deref()).await?;
     }
     Ok(())
 }
@@ -78,9 +77,9 @@ ps: the naming took like 5 mins X)
     )
 }
 
-async fn run_app(args: &Args, cfg: &Config) -> Result<(), Box<dyn Error>> {
+async fn run_app(args: &Args, cfg: &Config, context: Option<&str>) -> Result<(), Box<dyn Error>> {
     if let Some(prompt) = &args.prompt {
-        let reply = prompt_agent(cfg, prompt, args.context.as_deref()).await?;
+        let reply = prompt_agent(cfg, prompt, context).await?;
         println!(": {reply}");
     } else {
         print_about();
