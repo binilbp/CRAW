@@ -18,7 +18,7 @@ pub fn run_setup(cfg: &mut config::Config) -> Result<(), Box<dyn Error>> {
     //add api to OS keyring
     keyring::add_key("groq_api_key", api_key.trim())?;
     //also add the service type in config file
-    cfg.set_api_service(config::Services::GROQ)?;
+    cfg.set_api_service(config::Services::GROQ, "craw", "craw-config")?;
 
     println!("API key set!");
 
@@ -26,7 +26,7 @@ pub fn run_setup(cfg: &mut config::Config) -> Result<(), Box<dyn Error>> {
 }
 
 pub async fn prompt_agent(
-    _cfg: &Config,
+    cfg: &Config,
     prompt: &str,
     context: Option<&str>,
 ) -> Result<String, Box<dyn Error>> {
@@ -35,7 +35,7 @@ pub async fn prompt_agent(
     let groq_client = groq::Client::new(api_key)?;
     let groq_agent = groq_client
         .agent("llama-3.3-70b-versatile")
-        .preamble("your name is `craw `. you are a text-based-llm accessible from user terminal")
+        .preamble(&cfg.system_prompt)
         .build();
 
     let response = match context {
