@@ -1,5 +1,7 @@
 use clap::{Parser, Subcommand};
-use craw::{APP_NAME, CONFIG_FILE_NAME, config::Config, prompt_agent, run_reset, run_setup};
+use craw::{
+    APP_NAME, CONFIG_FILE_NAME, config::Config, prompt_agent, run_chat, run_reset, run_setup,
+};
 use std::{error::Error, path::PathBuf};
 
 #[derive(Parser, Debug)]
@@ -55,6 +57,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     //first run or api setup not done
     if cfg.api_service.is_none() {
         print_about();
+        run_setup(&mut cfg)?;
     } else {
         run_app(&args, &cfg, context.as_deref()).await?;
     }
@@ -67,16 +70,11 @@ fn print_about() {
         r#"
 CRAW   Yet another Cli Rust AI Wrapper
 
-This tool was created with intention to learn RUST while trying to
-solve my annoyance of opening a browser or learning a new already
-available better tool to access LLM from a terminal.
+This tool was created with intention to learn RUST while trying to solve
+my annoyance of opening a browser or learning a new already available
+better tool to access LLM from a terminal.
 Use nerdfont for better experience !
-
--> `craw setup` to get started
--> `craw "your prompt"` to prompt the llm
--> `craw help` for more usage info
-
-Feel free to suggest changes or express your issues
+Feel free to suggest changes or express your issues.
 
 ps: the naming took like 5 mins X)
 "#
@@ -88,7 +86,7 @@ async fn run_app(args: &Args, cfg: &Config, context: Option<&str>) -> Result<(),
         let reply = prompt_agent(cfg, prompt, context).await?;
         println!(": {reply}");
     } else {
-        print_about();
+        run_chat()?;
     }
     Ok(())
 }

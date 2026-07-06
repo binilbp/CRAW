@@ -58,3 +58,8 @@ pub async fn prompt_agent(
 
     Ok(response)
 }
+
+pub fn run_chat() -> Result<(), Box<dyn Error>> {
+    println!("chat running now!");
+    Ok(())
+}
