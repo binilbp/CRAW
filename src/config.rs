@@ -1,3 +1,5 @@
+use std::error::Error;
+
 use confy::ConfyError;
 use serde::{Deserialize, Serialize};
 
@@ -44,6 +46,14 @@ impl Config {
     ) -> Result<(), ConfyError> {
         self.system_prompt = sys_prompt.into();
         confy::store(app_name, file_name, self)?;
+        Ok(())
+    }
+
+    pub fn reset_config(&self, app_name: &str, file_name: &str) -> Result<(), Box<dyn Error>> {
+        //delete the config file, api and let config file build from default in next start as fresh.
+        let config_file_path = confy::get_configuration_file_path(app_name, file_name)?;
+        std::fs::remove_file(config_file_path)?;
+
         Ok(())
     }
 }

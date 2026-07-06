@@ -1,19 +1,19 @@
 use keyring::{Entry, Result as KeyringResult};
 
-pub fn add_key(service: &str, api_key: &str) -> KeyringResult<()> {
-    let entry = Entry::new("craw", service)?;
+pub fn add_key(service_name: &str, api_key: &str) -> KeyringResult<()> {
+    let entry = Entry::new("craw", service_name)?;
     entry.set_password(api_key)?;
     Ok(())
 }
 
-pub fn get_key(service: &str) -> KeyringResult<String> {
-    let entry = Entry::new("craw", service)?;
+pub fn get_key(service_name: &str) -> KeyringResult<String> {
+    let entry = Entry::new("craw", service_name)?;
     let key = entry.get_password()?;
     Ok(key)
 }
 
-pub fn delete_key(service: &str) -> KeyringResult<()> {
-    let entry = Entry::new("craw", service)?;
+pub fn delete_key(service_name: &str) -> KeyringResult<()> {
+    let entry = Entry::new("craw", service_name)?;
     entry.delete_credential()?;
     Ok(())
 }
