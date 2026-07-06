@@ -1,5 +1,5 @@
 use clap::{Parser, Subcommand};
-use craw::{config::Config, prompt_agent, run_setup};
+use craw::{APP_NAME, CONFIG_FILE_NAME, config::Config, prompt_agent, run_reset, run_setup};
 use std::{error::Error, path::PathBuf};
 
 #[derive(Parser, Debug)]
@@ -19,16 +19,18 @@ struct Args {
 
 #[derive(Subcommand, Debug)]
 enum Commands {
-    /// Setup craw, start here
-    Setup,
     /// Print info message
     About,
+    /// Setup craw, start here
+    Setup,
+    /// Reset craw
+    Reset,
 }
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
     let args = Args::parse();
-    let mut cfg: Config = confy::load("craw", "craw-config")?;
+    let mut cfg: Config = confy::load(APP_NAME, CONFIG_FILE_NAME)?;
     let context: Option<String> = None;
     // println!("{:?}", &args);
     // println!("{:?}", &cfg);
@@ -41,6 +43,10 @@ async fn main() -> Result<(), Box<dyn Error>> {
             }
             Commands::About => {
                 print_about();
+                return Ok(());
+            }
+            Commands::Reset => {
+                run_reset(&cfg)?;
                 return Ok(());
             }
         }

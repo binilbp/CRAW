@@ -6,7 +6,8 @@ use rig::completion::Prompt;
 use rig::providers::groq;
 use std::{error::Error, io};
 
-use crate::config::Config;
+pub const APP_NAME: &'static str = "craw";
+pub const CONFIG_FILE_NAME: &'static str = "craw-config";
 
 pub fn run_setup(cfg: &mut config::Config) -> Result<(), Box<dyn Error>> {
     let mut api_key = String::new();
@@ -18,15 +19,22 @@ pub fn run_setup(cfg: &mut config::Config) -> Result<(), Box<dyn Error>> {
     //add api to OS keyring
     keyring::add_key("groq_api_key", api_key.trim())?;
     //also add the service type in config file
-    cfg.set_api_service(config::Services::GROQ, "craw", "craw-config")?;
+    cfg.set_api_service(config::Services::GROQ, APP_NAME, CONFIG_FILE_NAME)?;
 
     println!("API key set!");
 
     Ok(())
 }
 
+pub fn run_reset(cfg: &config::Config) -> Result<(), Box<dyn Error>> {
+    cfg.reset_config(APP_NAME, CONFIG_FILE_NAME)?;
+    keyring::delete_key("groq_api_key")?;
+    println!("Reset succesfull. Please restart");
+    Ok(())
+}
+
 pub async fn prompt_agent(
-    cfg: &Config,
+    cfg: &config::Config,
     prompt: &str,
     context: Option<&str>,
 ) -> Result<String, Box<dyn Error>> {
